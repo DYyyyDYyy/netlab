@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="601" height="506" viewBox="0 0 601 506" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13">
+<rect width="601" height="506" rx="8" fill="#1e1e2e"/>
+<circle cx="18" cy="16" r="5" fill="#f38ba8"/><circle cx="36" cy="16" r="5" fill="#f9e2af"/><circle cx="54" cy="16" r="5" fill="#a6e3a1"/>
+<text x="16" y="52" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-host1 traceroute -I -n -w1 -q1 203.0.113.100</text>
+<text x="16" y="70" fill="#cdd6f4" xml:space="preserve">traceroute to 203.0.113.100 (203.0.113.100), 30 hops max, 60 byte packets</text>
+<text x="16" y="88" fill="#cdd6f4" xml:space="preserve"> 1  10.10.1.1  0.139 ms</text>
+<text x="16" y="106" fill="#cdd6f4" xml:space="preserve"> 2  10.0.13.2  0.079 ms</text>
+<text x="16" y="124" fill="#cdd6f4" xml:space="preserve"> 3  203.0.113.100  0.119 ms</text>
+<text x="16" y="142" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-host1 curl -s 203.0.113.100/cgi-bin/whoami</text>
+<text x="16" y="160" fill="#cdd6f4" xml:space="preserve">203.0.113.1</text>
+<text x="16" y="178" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-isp curl -s 203.0.113.1:8080</text>
+<text x="16" y="196" fill="#cdd6f4" xml:space="preserve">srv1</text>
+<text x="16" y="214" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-host1 curl -s -m2 203.0.113.100:22</text>
+<text x="16" y="232" fill="#f38ba8" xml:space="preserve">(exit 28: blocked by firewall)</text>
+<text x="16" y="250" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-host1 dig +short @10.10.2.53 srv1.netlab.internal</text>
+<text x="16" y="268" fill="#cdd6f4" xml:space="preserve">10.10.2.2</text>
+<text x="16" y="286" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-host1 dig +short @10.10.2.53 -x 10.10.1.3</text>
+<text x="16" y="304" fill="#cdd6f4" xml:space="preserve">host2.netlab.internal.</text>
+<text x="16" y="322" fill="#89b4fa" xml:space="preserve">$ docker exec netlab-r1 vtysh -c &quot;show ip route ospf&quot;</text>
+<text x="16" y="340" fill="#cdd6f4" xml:space="preserve">O&gt;* 0.0.0.0/0 [110/1] via 10.0.13.2, c13, weight 1, 00:00:47</text>
+<text x="16" y="358" fill="#cdd6f4" xml:space="preserve">O   10.0.12.0/29 [110/10] is directly connected, c12, weight 1, 00:01:14</text>
+<text x="16" y="376" fill="#cdd6f4" xml:space="preserve">O   10.0.13.0/29 [110/10] is directly connected, c13, weight 1, 00:00:54</text>
+<text x="16" y="394" fill="#cdd6f4" xml:space="preserve">O&gt;* 10.0.23.0/29 [110/20] via 10.0.12.2, c12, weight 1, 00:00:48</text>
+<text x="16" y="412" fill="#cdd6f4" xml:space="preserve">O   10.10.1.0/24 [110/10] is directly connected, lan0, weight 1, 00:01:14</text>
+<text x="16" y="430" fill="#cdd6f4" xml:space="preserve">O&gt;* 10.10.2.0/24 [110/20] via 10.0.12.2, c12, weight 1, 00:01:03</text>
+<text x="16" y="448" fill="#cdd6f4" xml:space="preserve">O   10.255.0.1/32 [110/0] is directly connected, lo, weight 1, 00:01:14</text>
+<text x="16" y="466" fill="#cdd6f4" xml:space="preserve">O&gt;* 10.255.0.2/32 [110/10] via 10.0.12.2, c12, weight 1, 00:01:03</text>
+<text x="16" y="484" fill="#cdd6f4" xml:space="preserve">O&gt;* 10.255.0.3/32 [110/10] via 10.0.13.2, c13, weight 1, 00:00:48</text>
+</svg>

@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy app lab
+
+  test:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: netlab
+          POSTGRES_PASSWORD: netlab
+          POSTGRES_DB: netlab
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U netlab" --health-interval 2s --health-retries 20
+    env:
+      NETLAB_DATABASE_URL: postgresql+psycopg://netlab:netlab@127.0.0.1:5432/netlab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run pytest -m "not lab"
+
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t netlab-api .
+      - name: image runs as non-root
+        run: test "$(docker run --rm --entrypoint id netlab-api -u)" = "10001"
+
+  # Full docker lab: FRR routers, nftables NAT/firewall, CoreDNS, then network tests.
+  lab:
+    needs: [test]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: docker version --format 'docker {{.Server.Version}}'
+      - run: make demo
+      - run: make lab-test
+      - name: dump lab state on failure
+        if: failure()
+        run: |
+          docker ps -a
+          for c in $(docker ps -aq --filter label=netlab.lab=1) netlab-api; do
+            echo "::group::$c"; docker logs "$c" 2>&1 | tail -50; echo "::endgroup::"
+          done
+          docker exec netlab-border nft list ruleset || true
+          docker exec netlab-r1 ip route || true

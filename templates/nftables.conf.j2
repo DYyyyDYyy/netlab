@@ -50,7 +50,8 @@ table ip nat {
 
     chain postrouting {
         type nat hook postrouting priority srcnat; policy accept;
-        # PAT: many inside hosts share the single WAN address
-        oifname $WAN_IF ip saddr $INSIDE masquerade
+        # PAT: all inside hosts share the single static WAN address (source ports remapped
+        # on collision). snat, not masquerade: the WAN address is static and known from IPAM.
+        oifname $WAN_IF ip saddr $INSIDE snat to $WAN_IP
     }
 }
